@@ -1,7 +1,12 @@
 node_modules/
 dist/
+build/
+logs/
 .env
+.env.*
+!.env.example
 .DS_Store
+Thumbs.db
 scratch.js
 test*.js
 capture-screenshots.js
