@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+.DS_Store
+scratch.js
+test*.js
+capture-screenshots.js
