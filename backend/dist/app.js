@@ -26,6 +26,21 @@ const apiLimiter = (0, express_rate_limit_1.default)({
 });
 exports.app.use('/api', apiLimiter);
 // Routes
+exports.app.get('/api', (req, res) => {
+    res.status(200).json({
+        status: 'success',
+        message: 'Welcome to the PlayStack Employee Management API',
+        version: '1.0.0',
+        documentation: 'Coming Soon',
+        health: '/api/health',
+        availableEndpoints: {
+            auth: '/api/auth',
+            employees: '/api/employees',
+            dashboard: '/api/dashboard',
+            organization: '/api/organization'
+        }
+    });
+});
 exports.app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'success', message: 'API is running' });
 });
