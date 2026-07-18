@@ -1,10 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.employeeService = exports.EmployeeService = void 0;
 const employee_repository_1 = require("../repositories/employee.repository");
 const AppError_1 = require("../utils/AppError");
 const hash_1 = require("../utils/hash");
 const constants_1 = require("../utils/constants");
+const crypto_1 = __importDefault(require("crypto"));
 class EmployeeService {
     async createEmployee(data) {
         // Business Rule: Duplicate Employee ID Check
@@ -13,16 +17,21 @@ class EmployeeService {
             if (existingId)
                 throw new AppError_1.AppError('Employee ID already exists', 400);
         }
+        else {
+            data.employeeId = `EMP-${crypto_1.default.randomBytes(3).toString('hex').toUpperCase()}`;
+        }
         // Business Rule: Duplicate Email Check
         if (data.email) {
             const existingEmail = await employee_repository_1.employeeRepository.findByEmail(data.email);
             if (existingEmail)
                 throw new AppError_1.AppError('Email already exists', 400);
         }
-        // Hash password if provided (required on create, but just safe-guarding)
-        if (data.password) {
-            data.password = await (0, hash_1.hashPassword)(data.password);
+        // Generate random secure password if not provided
+        if (!data.password) {
+            data.password = `NEXUS@${crypto_1.default.randomBytes(4).toString('hex')}`;
         }
+        // Hash password
+        data.password = await (0, hash_1.hashPassword)(data.password);
         return await employee_repository_1.employeeRepository.create(data);
     }
     async getEmployeeById(id) {

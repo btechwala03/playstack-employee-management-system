@@ -3,7 +3,12 @@ import { employeeService } from '../services/employee.service';
 import { sendSuccess } from '../utils/response';
 import { ROLES } from '../utils/constants';
 
+import { AppError } from '../utils/AppError';
+
 export const createEmployee = async (req: Request, res: Response) => {
+  if (req.user?.role === ROLES.HR_MANAGER && req.body.role === ROLES.SUPER_ADMIN) {
+    throw new AppError('HR Managers cannot create Super Admins', 403);
+  }
   const employee = await employeeService.createEmployee(req.body);
   sendSuccess(res, 201, employee, 'Employee created successfully');
 };
@@ -33,15 +38,23 @@ export const getEmployeeById = async (req: Request, res: Response) => {
 
 export const updateEmployee = async (req: Request, res: Response) => {
   const id = req.params.id as string;
+  
+  if (req.user?.role === ROLES.HR_MANAGER && req.body.role === ROLES.SUPER_ADMIN) {
+    throw new AppError('HR Managers cannot assign Super Admin role', 403);
+  }
+
   const employee = await employeeService.updateEmployee(id, req.body);
   sendSuccess(res, 200, employee, 'Employee updated successfully');
 };
 
 export const deleteEmployee = async (req: Request, res: Response) => {
   const id = req.params.id as string;
-  // Mock requester role for now since Auth is not fully implemented
-  // In production, this comes from req.user.role
-  const requesterRole = req.user?.role || ROLES.SUPER_ADMIN; 
+  
+  if (req.user?.role !== ROLES.SUPER_ADMIN) {
+    throw new AppError('Only Super Admins can delete employees', 403);
+  }
+  
+  const requesterRole = req.user.role;
 
   await employeeService.deleteEmployee(id, requesterRole);
   sendSuccess(res, 200, null, 'Employee deleted successfully');

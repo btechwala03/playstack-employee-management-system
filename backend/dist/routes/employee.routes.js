@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const employee_controller_1 = require("../controllers/employee.controller");
+const organization_controller_1 = require("../controllers/organization.controller");
 const validate_middleware_1 = require("../middlewares/validate.middleware");
 const auth_middleware_1 = require("../middlewares/auth.middleware");
 const role_middleware_1 = require("../middlewares/role.middleware");
@@ -16,4 +17,7 @@ router.get('/', role_middleware_1.requireHrOrAbove, (0, asyncWrapper_1.asyncWrap
 router.get('/:id', (0, asyncWrapper_1.asyncWrapper)(employee_controller_1.getEmployeeById));
 router.put('/:id', (0, validate_middleware_1.validate)(employee_validator_1.updateEmployeeSchema), (0, asyncWrapper_1.asyncWrapper)(employee_controller_1.updateEmployee));
 router.delete('/:id', role_middleware_1.requireHrOrAbove, (0, asyncWrapper_1.asyncWrapper)(employee_controller_1.deleteEmployee));
+// Aliases required by the specification
+router.get('/:id/reportees', role_middleware_1.requireHrOrAbove, (0, asyncWrapper_1.asyncWrapper)(organization_controller_1.getDirectReports));
+router.patch('/:id/manager', role_middleware_1.requireHrOrAbove, (0, asyncWrapper_1.asyncWrapper)(organization_controller_1.updateManager));
 exports.default = router;

@@ -1,115 +1,134 @@
-# Nexus EMS API Documentation
+# API Documentation
 
-Base URL: `/api`
+All endpoints are prefixed with `/api` and require a valid Bearer token in the `Authorization` header unless otherwise specified.
 
 ## Authentication
 
-### POST `/api/auth/login`
-Authenticates a user and returns a JWT token.
+### 1. Login
+- **Method:** `POST`
+- **URL:** `/api/auth/login`
+- **Authentication:** None
 - **Request Body:**
-  ```json
-  {
-    "email": "admin@playstack.com",
-    "password": "Password@123"
-  }
-  ```
-- **Response:** `200 OK`
-  ```json
-  {
-    "token": "eyJhbGciOiJIUz...",
-    "employee": {
-      "_id": "60d5ec...",
-      "firstName": "System",
-      "lastName": "Admin",
-      "role": "SUPER_ADMIN",
-      ...
+```json
+{
+  "email": "admin@playstack.com",
+  "password": "Password123"
+}
+```
+- **Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "token": "eyJhbG...",
+    "user": {
+      "id": "123",
+      "email": "admin@playstack.com",
+      "role": "SUPER_ADMIN"
     }
   }
-  ```
-- **Validation:** Both `email` and `password` are required.
+}
+```
 
-### POST `/api/auth/logout`
-Invalidates the current session token (handled client-side by clearing localStorage, but endpoint provided for future server-side blocklisting).
-- **Authorization:** Bearer Token (Any authenticated user)
+### 2. Logout
+- **Method:** `POST`
+- **URL:** `/api/auth/logout`
+- **Authentication:** Required
+- **Response (200 OK):**
+```json
+{
+  "status": "success",
+  "message": "Logged out successfully"
+}
+```
+
+---
 
 ## Employees
 
-### GET `/api/employees`
-Retrieves a paginated list of employees.
-- **Authorization:** Bearer Token (Any authenticated user)
-- **Query Parameters:**
-  - `page` (default: 1)
-  - `limit` (default: 10)
-  - `search` (matches against name/email)
-  - `department` (exact match)
-  - `role` (exact match)
-  - `status` (exact match)
-  - `sortBy` (default: 'createdAt')
-  - `sortOrder` (asc | desc, default: 'desc')
-- **Response:** `200 OK`
-  ```json
-  {
-    "data": [{...}, {...}],
+### 1. Get All Employees
+- **Method:** `GET`
+- **URL:** `/api/employees`
+- **Authentication:** Required (HR_MANAGER or SUPER_ADMIN)
+- **Query Params:** `search`, `department`, `role`, `status`, `page`, `limit`
+- **Response (200 OK):**
+```json
+{
+  "status": "success",
+  "data": {
+    "data": [...],
     "total": 50,
     "page": 1,
-    "limit": 10,
     "totalPages": 5
   }
-  ```
+}
+```
 
-### GET `/api/employees/:id`
-Retrieves a specific employee's details.
-- **Authorization:** Bearer Token (Any authenticated user)
-- **Response:** `200 OK` (Employee Object)
-
-### GET `/api/employees/:id/reports`
-Retrieves the direct reports (subordinates) of a specific employee.
-- **Authorization:** Bearer Token (Any authenticated user)
-- **Response:** `200 OK` (Array of Employee Objects)
-
-### POST `/api/employees`
-Creates a new employee.
-- **Authorization:** Bearer Token (`SUPER_ADMIN` or `HR_MANAGER`)
+### 2. Create Employee
+- **Method:** `POST`
+- **URL:** `/api/employees`
+- **Authentication:** Required (HR_MANAGER or SUPER_ADMIN)
 - **Request Body:**
-  ```json
-  {
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "john.doe@playstack.com",
-    "department": "Engineering",
-    "designation": "Frontend Developer",
-    "salary": 85000,
-    "joiningDate": "2024-01-01",
-    "role": "EMPLOYEE",
-    "status": "ACTIVE"
-  }
-  ```
-- **Validation:** Validates duplicate email and duplicate employeeId.
+```json
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john@playstack.com",
+  "phone": "1234567890",
+  "department": "Engineering",
+  "designation": "Developer",
+  "salary": 60000,
+  "joiningDate": "2023-01-01T00:00:00.000Z",
+  "role": "EMPLOYEE",
+  "status": "ACTIVE"
+}
+```
+*Note: `employeeId` and `password` are auto-generated if omitted.*
+- **Response (201 Created):** Returns the created employee object.
 
-### PUT `/api/employees/:id`
-Updates an existing employee.
-- **Authorization:** Bearer Token (`SUPER_ADMIN` or `HR_MANAGER`)
-- **Validation:** Cannot change `email` or `employeeId` to one that already exists.
+### 3. Update Employee
+- **Method:** `PUT`
+- **URL:** `/api/employees/:id`
+- **Authentication:** Required (HR_MANAGER or SUPER_ADMIN)
+- **Request Body:** Any subset of employee fields.
+- **Response (200 OK):** Returns the updated employee object.
 
-### DELETE `/api/employees/:id`
-Soft deletes an employee (sets status to `INACTIVE` or removes them depending on implementation).
-- **Authorization:** Bearer Token (`SUPER_ADMIN` only)
-- **Validation:** Cannot delete oneself.
+### 4. Delete Employee
+- **Method:** `DELETE`
+- **URL:** `/api/employees/:id`
+- **Authentication:** Required (SUPER_ADMIN)
+- **Response (200 OK):**
+```json
+{
+  "status": "success",
+  "message": "Employee deleted successfully"
+}
+```
 
-## Dashboard
+---
 
-### GET `/api/dashboard/summary`
-Retrieves aggregate metrics for the dashboard.
-- **Authorization:** Bearer Token (Any authenticated user)
-- **Response:** `200 OK`
-  ```json
-  {
-    "totalEmployees": 150,
-    "activeEmployees": 140,
-    "inactiveEmployees": 10,
-    "departmentStats": [
-      { "_id": "Engineering", "count": 50 },
-      ...
-    ]
-  }
-  ```
+## Organization & Hierarchy
+
+### 1. Get Organization Tree
+- **Method:** `GET`
+- **URL:** `/api/organization/tree`
+- **Authentication:** Required (HR_MANAGER or SUPER_ADMIN)
+- **Response (200 OK):** Returns nested tree structure of employees.
+
+### 2. Get Direct Reportees
+- **Method:** `GET`
+- **URL:** `/api/employees/:id/reportees`
+- **Authentication:** Required (HR_MANAGER or SUPER_ADMIN)
+- **Response (200 OK):** Returns an array of employees reporting to the specified ID.
+
+### 3. Assign Reporting Manager
+- **Method:** `PATCH`
+- **URL:** `/api/employees/:id/manager`
+- **Authentication:** Required (HR_MANAGER or SUPER_ADMIN)
+- **Request Body:**
+```json
+{
+  "managerId": "64bc1234abcd567890ef"
+}
+```
+- **Response (200 OK):** Returns updated employee profile.

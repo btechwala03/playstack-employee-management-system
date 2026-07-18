@@ -5,11 +5,11 @@ const zod_1 = require("zod");
 const constants_1 = require("../utils/constants");
 exports.createEmployeeSchema = zod_1.z.object({
     body: zod_1.z.object({
-        employeeId: zod_1.z.string().min(1, 'Employee ID is required'),
+        employeeId: zod_1.z.string().min(1, 'Employee ID must not be empty').optional(),
         firstName: zod_1.z.string().min(1, 'First name is required'),
         lastName: zod_1.z.string().min(1, 'Last name is required'),
         email: zod_1.z.string().email('Invalid email address'),
-        password: zod_1.z.string().min(6, 'Password must be at least 6 characters'),
+        password: zod_1.z.string().min(6, 'Password must be at least 6 characters').optional(),
         phone: zod_1.z.string().min(10, 'Phone must be at least 10 digits'),
         department: zod_1.z.string().min(1, 'Department is required'),
         designation: zod_1.z.string().min(1, 'Designation is required'),

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useCreateEmployee, useUpdateEmployee } from '../../hooks/useEmployees';
+import { useCreateEmployee, useUpdateEmployee, useEmployees } from '../../hooks/useEmployees';
 import { useAuth } from '../../providers/AuthProvider';
 import { mapEmployeeToFigma } from '../../utils/mappers';
 import { Modal, FieldInput, FieldSelect, Btn } from '../FigmaShared';
@@ -38,10 +38,18 @@ export default function EmployeeModal({ isOpen, onClose, employee }: EmployeeMod
     salary: '',
     joiningDate: new Date().toISOString().split('T')[0],
     role: 'EMPLOYEE',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
+    employeeId: '',
+    profileImage: '',
+    reportingManager: ''
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const { data: employeesData } = useEmployees({ limit: 1000 });
+  const potentialManagers = (employeesData?.data || [])
+    .filter(emp => emp._id !== employee?._id)
+    .map(emp => ({ value: emp._id, label: `${emp.firstName} ${emp.lastName} (${emp.designation})` }));
 
   useEffect(() => {
     if (employee) {
@@ -55,13 +63,16 @@ export default function EmployeeModal({ isOpen, onClose, employee }: EmployeeMod
         salary: employee.salary ? String(employee.salary) : '',
         joiningDate: employee.joiningDate ? new Date(employee.joiningDate).toISOString().split('T')[0] : '',
         role: employee.role || 'EMPLOYEE',
-        status: employee.status || 'ACTIVE'
+        status: employee.status || 'ACTIVE',
+        employeeId: employee.employeeId || '',
+        profileImage: employee.profileImage || '',
+        reportingManager: employee.reportingManager || ''
       });
     } else {
       setFormData({
         firstName: '', lastName: '', email: '', phone: '', department: '',
         designation: '', salary: '', joiningDate: new Date().toISOString().split('T')[0],
-        role: 'EMPLOYEE', status: 'ACTIVE'
+        role: 'EMPLOYEE', status: 'ACTIVE', employeeId: '', profileImage: '', reportingManager: ''
       });
     }
     setErrors({});
@@ -89,11 +100,17 @@ export default function EmployeeModal({ isOpen, onClose, employee }: EmployeeMod
         ...formData,
         salary: Number(formData.salary)
       };
+      
+      // Clean up empty optional fields
+      const submitData: any = { ...payload };
+      if (!submitData.employeeId) delete submitData.employeeId;
+      if (!submitData.profileImage) delete submitData.profileImage;
+      if (!submitData.reportingManager) delete submitData.reportingManager;
 
       if (isEditing && employee) {
-        await updateMutation.mutateAsync({ id: employee._id, data: payload as any });
+        await updateMutation.mutateAsync({ id: employee._id, data: submitData });
       } else {
-        await createMutation.mutateAsync(payload as any);
+        await createMutation.mutateAsync(submitData);
       }
       onClose();
     } catch (e) {
@@ -107,6 +124,8 @@ export default function EmployeeModal({ isOpen, onClose, employee }: EmployeeMod
     <Modal open={isOpen} onClose={onClose} title={isEditing ? 'Edit Employee' : 'Add Employee'}>
       <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1 py-1 custom-scrollbar">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FieldInput label="Employee ID" value={formData.employeeId} onChange={(v) => setFormData({ ...formData, employeeId: v })} placeholder="Auto-generated if blank" disabled={isEditing} />
+          <FieldInput label="Profile Image URL" value={formData.profileImage} onChange={(v) => setFormData({ ...formData, profileImage: v })} placeholder="https://..." />
           <FieldInput label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} error={errors.firstName} required />
           <FieldInput label="Last Name" value={formData.lastName} onChange={(v) => setFormData({ ...formData, lastName: v })} error={errors.lastName} required />
           <FieldInput label="Email" type="email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} error={errors.email} required disabled={isEditing} />
@@ -134,6 +153,13 @@ export default function EmployeeModal({ isOpen, onClose, employee }: EmployeeMod
               { value: 'ACTIVE', label: 'Active' },
               { value: 'INACTIVE', label: 'Inactive' }
             ]} 
+          />
+          <FieldSelect 
+            label="Reporting Manager" 
+            value={formData.reportingManager} 
+            onChange={(v) => setFormData({ ...formData, reportingManager: v })} 
+            options={potentialManagers} 
+            placeholder="None" 
           />
         </div>
       </div>

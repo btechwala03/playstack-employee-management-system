@@ -1,122 +1,124 @@
-# Nexus Employee Management System (EMS)
+# Nexus - Employee Management System
 
-![Dashboard Preview](./docs/screenshots/02_dashboard.png)
+![Nexus Hero Placeholder](https://via.placeholder.com/1200x400?text=Nexus+Employee+Management+System)
 
-## 📌 Project Overview
-Nexus EMS is a modern, enterprise-grade Employee Management System designed to streamline HR operations. It provides a highly responsive, aesthetic, and fully-featured dashboard to manage employee directories, track department hierarchies, and maintain personnel records with strict Role-Based Access Control (RBAC). The platform features an impeccable pixel-perfect UI generated from a custom Figma design, ensuring an engaging user experience (UX) and seamless transitions.
+## 📋 Project Overview
+
+Nexus is a full-stack Employee Management System designed to provide administrators and HR personnel with powerful tools to manage employees, track organizational hierarchies, and enforce Role-Based Access Control (RBAC).
 
 ## ✨ Features
-- **Secure Authentication & RBAC**: Role-Based Access Control (Super Admin, HR Manager, Employee) with JWT-based session persistence and secure HTTP standards.
-- **Interactive Dashboard**: Real-time analytics, status metrics, and department breakdowns visualized through interactive widgets and Recharts.
-- **Comprehensive Employee CRUD**: Advanced sorting, filtering, server-side pagination, and search capabilities across the entire organizational directory.
-- **Organizational Hierarchy**: Visual mapping of direct reports and manager-employee relationships.
-- **Pixel-Perfect UI/UX**: Developed faithfully to Figma specifications utilizing Tailwind V4, Lucide React icons, smooth micro-animations, and responsive glassmorphic layouts.
-- **Dynamic Theming**: First-class support for Light and Dark modes.
+
+- **Authentication & Authorization**: Secure JWT-based login with hashed passwords.
+- **Role-Based Access Control (RBAC)**: 
+  - **Super Admin**: Full CRUD capabilities, can assign roles and managers, and manage other admins.
+  - **HR Manager**: Can create and edit employees, but cannot delete or assign Super Admin roles.
+  - **Employee**: Can view their own profile and edit permitted fields.
+- **Employee CRUD**: Complete management of employee records with comprehensive validations.
+- **Organizational Hierarchy**: Assign reporting managers and visualize the direct report structure. Prevents circular reporting logic.
+- **Interactive Dashboard**: Real-time statistics fetched directly from the database for total, active, and inactive employees.
+- **Search, Filter & Sorting**: Efficiently locate employees by name, email, department, role, or status.
+- **Responsive UI**: Fully optimized for Desktop, Tablet, and Mobile Android/iOS devices.
 
 ## 🛠️ Tech Stack
-- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS V4, React Query (TanStack), Axios, Recharts, React Router DOM, React Hot Toast.
-- **Backend**: Node.js, Express, TypeScript, MongoDB (Mongoose), JSON Web Tokens (JWT), Bcrypt.
 
-## 📐 Architecture
-The application follows a clean, layered architecture separating the **Presentation Layer** (React/Vite), **Service Layer** (React Query/Axios), **API Layer** (Express Controllers/Routes), and **Data Layer** (MongoDB/Mongoose Models). For detailed architectural diagrams and flow, please see the [Architecture Documentation](ARCHITECTURE.md).
+**Frontend:**
+- React (Vite)
+- TypeScript
+- Tailwind CSS (Utility-first styling without frameworks)
+- React Router DOM
+- React Query (Data fetching)
+- Recharts (Dashboard visualization)
 
-## 📂 Folder Structure
-```
-├── backend/
-│   ├── src/
-│   │   ├── config/       # Environment & Database config
-│   │   ├── controllers/  # Route handlers
-│   │   ├── middlewares/  # Auth & Validation guards
-│   │   ├── models/       # Mongoose schemas
-│   │   ├── routes/       # API endpoints
-│   │   ├── services/     # Business logic
-│   │   └── seed.ts       # Database seeding script
-├── frontend/
-│   ├── src/
-│   │   ├── components/   # Reusable UI & FigmaShared
-│   │   ├── hooks/        # React Query custom hooks
-│   │   ├── pages/        # Route-level components
-│   │   ├── providers/    # Context providers (Auth, Theme)
-│   │   ├── services/     # Axios API client
-│   │   └── index.css     # Global styles & Tailwind tokens
-└── docs/                 # Screenshots and documentation
-```
+**Backend:**
+- Node.js & Express.js
+- TypeScript
+- MongoDB & Mongoose
+- JSON Web Tokens (JWT) & bcrypt
+- Zod (Request Validation)
+- Helmet & Express Rate Limit (Security)
 
-## 🚀 Installation & Running Locally
+## 🚀 Deployment
+
+- **Frontend (Vercel)**: [Live Demo URL](https://playstack-employee-management-system-production.up.railway.app)
+- **Backend (Railway)**: [Live API URL](https://playstack-employee-management-system-production.up.railway.app)
+
+## 📦 Installation & Running Locally
 
 ### Prerequisites
 - Node.js (v18+)
-- MongoDB Community Server (or Atlas URI)
+- MongoDB (Local or Atlas URI)
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/your-username/nexus-ems.git
-cd nexus-ems
+### Environment Variables
+
+**Backend (`backend/.env`)**
+```env
+PORT=5000
+NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/nexus
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=24h
 ```
 
-### 2. Backend Setup
+**Frontend (`frontend/.env`)**
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+### Steps to Run
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/btechwala03/playstack-employee-management-system.git
+cd playstack-employee-management-system
+```
+
+2. **Start the Backend**
 ```bash
 cd backend
 npm install
-
-# Create a .env file (see Environment Variables section)
-
-# Seed the database with demo accounts
-npm run seed
-
-# Start the backend server
 npm run dev
 ```
 
-### 3. Frontend Setup
+3. **Start the Frontend (in a new terminal)**
 ```bash
-cd ../frontend
-npm install
-
-# Start the frontend dev server
+cd frontend
+npm install --legacy-peer-deps
 npm run dev
 ```
 
-## ⚙️ Environment Variables
-Create a `.env` file in the `/backend` directory:
-```env
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/playstack
-JWT_SECRET=your_super_secret_jwt_key
-JWT_EXPIRES_IN=7d
+## 📂 Folder Structure
+
 ```
-No environment variables are strictly required for the frontend out-of-the-box, as Axios falls back to `http://localhost:5000/api`. For production, configure `VITE_API_URL`.
+playstack/
+├── backend/                  # Express/Node API
+│   ├── src/
+│   │   ├── controllers/      # Route logic
+│   │   ├── middlewares/      # Auth, RBAC, Validation
+│   │   ├── models/           # Mongoose schemas
+│   │   ├── repositories/     # Database queries
+│   │   ├── routes/           # Express routes
+│   │   ├── services/         # Business logic
+│   │   └── validators/       # Zod schemas
+│   └── package.json
+└── frontend/                 # React UI
+    ├── src/
+    │   ├── components/       # Shared UI components
+    │   ├── hooks/            # React Query hooks
+    │   ├── layouts/          # Layout wrappers
+    │   ├── pages/            # Page components
+    │   ├── providers/        # Context providers
+    │   └── services/         # API clients
+    └── package.json
+```
 
-## 🔐 Role Credentials (Demo)
-You can test the system using the following seeded credentials:
+## 📖 API Documentation
 
-| Role | Email | Password | Access Level |
-| :--- | :--- | :--- | :--- |
-| **Super Admin** | `admin@playstack.com` | `Admin@123` | Full Access (CRUD all) |
-| **HR Manager** | `hr@playstack.com` | `Hr@123` | Can view and edit all |
-| **Employee** | `employee@playstack.com` | `Employee@123` | Read-only / Own profile |
+Please see the [API_DOCUMENTATION.md](./API_DOCUMENTATION.md) file for comprehensive API endpoint details.
 
-## 📸 Screenshots
+## 🔒 Security Enhancements
 
-| Login | Dashboard (Light) | Dashboard (Dark) |
-| :---: | :---: | :---: |
-| ![Login](./docs/screenshots/01_login.png) | ![Dashboard](./docs/screenshots/02_dashboard.png) | ![Dark Mode](./docs/screenshots/03_dark_mode.png) |
-
-| Employee Directory | Employee Profile | Organization View |
-| :---: | :---: | :---: |
-| ![Employees](./docs/screenshots/04_employees.png) | ![Profile](./docs/screenshots/05_employee_details.png) | ![Org](./docs/screenshots/06_organization.png) |
-
-## 🌐 API Endpoints
-Comprehensive endpoint documentation including payloads and response structures is available in the [API Documentation](API_DOCUMENTATION.md).
-
-## 🚢 Deployment
-Detailed instructions for preparing the application for production (e.g. Vercel, Render, Railway) can be found in the [Deployment Guide](DEPLOYMENT_GUIDE.md).
-
-## 🔮 Future Improvements
-- Two-Factor Authentication (2FA) for HR Managers and Admins.
-- Bulk CSV Employee Import/Export utility.
-- Activity audit logs for Super Admins.
-- Automated email notifications for account provisioning.
-
-## 📄 License
-This project is licensed under the MIT License.
+- Input sanitization and validation using Zod.
+- Secure HTTP headers via Helmet.
+- Bruteforce protection via Rate Limiting.
+- Passwords hashed via bcrypt before saving to DB.
+- Prevention of NoSQL injections.

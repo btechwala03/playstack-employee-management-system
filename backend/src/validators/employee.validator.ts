@@ -3,11 +3,11 @@ import { ROLES, STATUS } from '../utils/constants';
 
 export const createEmployeeSchema = z.object({
   body: z.object({
-    employeeId: z.string().min(1, 'Employee ID is required'),
+    employeeId: z.string().min(1, 'Employee ID must not be empty').optional(),
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: z.string().min(6, 'Password must be at least 6 characters').optional(),
     phone: z.string().min(10, 'Phone must be at least 10 digits'),
     department: z.string().min(1, 'Department is required'),
     designation: z.string().min(1, 'Designation is required'),

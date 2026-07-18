@@ -3,6 +3,7 @@ import { employeeRepository, EmployeeQueryParams, PaginatedResult } from '../rep
 import { AppError } from '../utils/AppError';
 import { hashPassword } from '../utils/hash';
 import { ROLES } from '../utils/constants';
+import crypto from 'crypto';
 
 export class EmployeeService {
   async createEmployee(data: Partial<IEmployee>): Promise<IEmployee> {
@@ -10,6 +11,8 @@ export class EmployeeService {
     if (data.employeeId) {
       const existingId = await employeeRepository.findByEmployeeId(data.employeeId);
       if (existingId) throw new AppError('Employee ID already exists', 400);
+    } else {
+      data.employeeId = `EMP-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
     }
 
     // Business Rule: Duplicate Email Check
@@ -18,10 +21,13 @@ export class EmployeeService {
       if (existingEmail) throw new AppError('Email already exists', 400);
     }
 
-    // Hash password if provided (required on create, but just safe-guarding)
-    if (data.password) {
-      data.password = await hashPassword(data.password);
+    // Generate random secure password if not provided
+    if (!data.password) {
+      data.password = `NEXUS@${crypto.randomBytes(4).toString('hex')}`;
     }
+
+    // Hash password
+    data.password = await hashPassword(data.password);
 
     return await employeeRepository.create(data);
   }
