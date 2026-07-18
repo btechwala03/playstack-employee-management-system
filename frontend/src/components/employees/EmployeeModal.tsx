@@ -106,7 +106,7 @@ export default function EmployeeModal({ isOpen, onClose, employee }: EmployeeMod
   return (
     <Modal open={isOpen} onClose={onClose} title={isEditing ? 'Edit Employee' : 'Add Employee'}>
       <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1 py-1 custom-scrollbar">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FieldInput label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} error={errors.firstName} required />
           <FieldInput label="Last Name" value={formData.lastName} onChange={(v) => setFormData({ ...formData, lastName: v })} error={errors.lastName} required />
           <FieldInput label="Email" type="email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} error={errors.email} required disabled={isEditing} />

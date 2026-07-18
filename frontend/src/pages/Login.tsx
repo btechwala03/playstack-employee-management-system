@@ -43,7 +43,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
@@ -53,7 +53,7 @@ export default function Login() {
           <p className="text-sm text-muted-foreground mt-1">Employee Management System</p>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-8 shadow-xl">
+        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-xl">
           <h2 className="text-lg font-semibold text-foreground mb-6" style={{ fontFamily: "Outfit, sans-serif" }}>Sign in to your account</h2>
 
           <form onSubmit={handleLogin} className="space-y-4">

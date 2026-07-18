@@ -107,8 +107,8 @@ export default function Employees() {
       />
 
       <div className="flex-1 overflow-hidden flex flex-col">
-        <div className="px-6 py-4 flex items-center gap-3 border-b border-border flex-shrink-0">
-          <div className="relative flex-1 max-w-sm">
+        <div className="px-4 md:px-6 py-4 flex flex-col md:flex-row md:items-center gap-3 border-b border-border flex-shrink-0">
+          <div className="relative w-full md:flex-1 md:max-w-sm">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
@@ -123,28 +123,28 @@ export default function Employees() {
         </div>
 
         {showFilters && (
-          <div className="px-6 py-3 border-b border-border bg-muted/30 flex items-center gap-3 flex-wrap flex-shrink-0">
-            <select value={queryParams.department} onChange={(e) => updateParams({ department: e.target.value, page: 1 })} className="px-3 py-1.5 bg-input-background border border-border rounded-lg text-xs text-foreground outline-none focus:ring-1 focus:ring-primary">
+          <div className="px-4 md:px-6 py-3 border-b border-border bg-muted/30 flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-wrap flex-shrink-0">
+            <select value={queryParams.department} onChange={(e) => updateParams({ department: e.target.value, page: 1 })} className="w-full sm:w-auto px-3 py-1.5 bg-input-background border border-border rounded-lg text-xs text-foreground outline-none focus:ring-1 focus:ring-primary">
               <option value="">All Departments</option>
               {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
             </select>
-            <select value={queryParams.status} onChange={(e) => updateParams({ status: e.target.value, page: 1 })} className="px-3 py-1.5 bg-input-background border border-border rounded-lg text-xs text-foreground outline-none focus:ring-1 focus:ring-primary">
+            <select value={queryParams.status} onChange={(e) => updateParams({ status: e.target.value, page: 1 })} className="w-full sm:w-auto px-3 py-1.5 bg-input-background border border-border rounded-lg text-xs text-foreground outline-none focus:ring-1 focus:ring-primary">
               <option value="">All Statuses</option>
               {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
             </select>
-            <select value={queryParams.role} onChange={(e) => updateParams({ role: e.target.value, page: 1 })} className="px-3 py-1.5 bg-input-background border border-border rounded-lg text-xs text-foreground outline-none focus:ring-1 focus:ring-primary">
+            <select value={queryParams.role} onChange={(e) => updateParams({ role: e.target.value, page: 1 })} className="w-full sm:w-auto px-3 py-1.5 bg-input-background border border-border rounded-lg text-xs text-foreground outline-none focus:ring-1 focus:ring-primary">
               <option value="">All Roles</option>
               {ROLES.map((r) => <option key={r} value={r.replace('_', ' ')}>{r.replace('_', ' ')}</option>)}
             </select>
             {activeFiltersCount > 0 && (
-              <button onClick={() => { updateParams({ department: "", role: "", status: "", page: 1 }); }} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1">
+              <button onClick={() => { updateParams({ department: "", role: "", status: "", page: 1 }); }} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mt-1 sm:mt-0">
                 <X size={11} /> Clear
               </button>
             )}
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-auto">
           {isLoading ? (
              <div className="flex flex-col items-center justify-center h-64 text-center">
                <p className="text-sm font-medium text-muted-foreground animate-pulse">Loading employees...</p>
@@ -156,8 +156,9 @@ export default function Employees() {
               <p className="text-xs text-muted-foreground/60 mt-1">Try adjusting your search or filters</p>
             </div>
           ) : (
-            <table className="w-full">
-              <thead className="sticky top-0 bg-card/95 backdrop-blur-sm border-b border-border z-10">
+            <div className="min-w-[900px]">
+              <table className="w-full">
+                <thead className="sticky top-0 bg-card/95 backdrop-blur-sm border-b border-border z-10">
                 <tr>
                   <th className="text-left px-6 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     <button onClick={() => handleSort('firstName')} className="flex items-center gap-1.5 hover:text-foreground transition-colors">
@@ -230,18 +231,19 @@ export default function Employees() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
         
         {/* Pagination */}
         {data && data.total > 0 && (
-          <div className="flex items-center justify-between border-t border-border px-6 py-3 bg-card flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-t border-border px-4 md:px-6 py-3 bg-card flex-shrink-0 gap-3 sm:gap-0">
             <p className="text-xs text-muted-foreground">
               Showing <span className="font-medium text-foreground">{(data.page - 1) * data.limit + 1}</span> to{' '}
               <span className="font-medium text-foreground">{Math.min(data.page * data.limit, data.total)}</span> of{' '}
               <span className="font-medium text-foreground">{data.total}</span> results
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
               <Btn variant="outline" size="sm" onClick={() => updateParams({ page: data.page - 1 })} disabled={data.page === 1}>
                 Previous
               </Btn>

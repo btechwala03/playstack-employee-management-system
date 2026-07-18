@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Users, GitBranch, Settings, LogOut, Bell, Building2, Moon, Sun, AlertCircle, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, ArrowUpDown, X, Filter, Plus, Pencil, Trash2, Eye } from "lucide-react";
+import { LayoutDashboard, Users, GitBranch, Settings, LogOut, Bell, Building2, Moon, Sun, AlertCircle, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, ArrowUpDown, X, Filter, Plus, Pencil, Trash2, Eye, Menu } from "lucide-react";
 import { Link, useLocation } from 'react-router-dom';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -213,9 +213,9 @@ export function ChartTooltip({ active, payload, label }: { active?: boolean; pay
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar({
-  currentUser, onLogout,
+  currentUser, onLogout, mobileOpen = false, onClose
 }: {
-  currentUser: { name: string, role: string } | null; onLogout: () => void;
+  currentUser: { name: string, role: string } | null; onLogout: () => void; mobileOpen?: boolean; onClose?: () => void;
 }) {
   const location = useLocation();
   const path = location.pathname;
@@ -227,18 +227,27 @@ export function Sidebar({
     { id: "/profile", label: "My Profile", icon: Settings },
   ];
   return (
-    <aside className="w-60 h-full flex flex-col bg-sidebar border-r border-sidebar-border flex-shrink-0">
-      <div className="px-5 py-5 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
-            <Building2 size={16} className="text-primary-foreground" />
+    <>
+      {mobileOpen && (
+        <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={onClose} />
+      )}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-60 transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} h-full flex flex-col bg-sidebar border-r border-sidebar-border flex-shrink-0`}>
+        <div className="px-5 py-5 border-b border-sidebar-border flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+              <Building2 size={16} className="text-primary-foreground" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-sidebar-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Nexus Corp</p>
+              <p className="text-xs text-muted-foreground">EMS Platform</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-semibold text-sidebar-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>Nexus Corp</p>
-            <p className="text-xs text-muted-foreground">EMS Platform</p>
-          </div>
+          {mobileOpen && onClose && (
+            <button onClick={onClose} className="md:hidden text-muted-foreground hover:text-foreground">
+              <X size={18} />
+            </button>
+          )}
         </div>
-      </div>
 
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {navItems.map((item) => {
@@ -271,7 +280,7 @@ export function Sidebar({
             </div>
             <button
               onClick={onLogout}
-              className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+              className="md:opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
               title="Sign out"
             >
               <LogOut size={15} />
@@ -280,6 +289,7 @@ export function Sidebar({
         </div>
       )}
     </aside>
+    </>
   );
 }
 
@@ -290,20 +300,28 @@ export function TopBar({
   title: string; subtitle?: string; actions?: React.ReactNode; isDark: boolean; toggleDark: () => void;
 }) {
   return (
-    <header className="h-14 flex items-center justify-between px-6 border-b border-border bg-background flex-shrink-0">
-      <div>
-        <h1 className="text-base font-semibold text-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>{title}</h1>
-        {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-      </div>
+    <header className="h-14 flex items-center justify-between px-4 md:px-6 border-b border-border bg-background flex-shrink-0">
       <div className="flex items-center gap-3">
+        <button
+          onClick={() => window.dispatchEvent(new Event('toggle-mobile-menu'))}
+          className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+        >
+          <Menu size={18} />
+        </button>
+        <div>
+          <h1 className="text-base font-semibold text-foreground" style={{ fontFamily: "Outfit, sans-serif" }}>{title}</h1>
+          {subtitle && <p className="text-xs text-muted-foreground hidden sm:block">{subtitle}</p>}
+        </div>
+      </div>
+      <div className="flex items-center gap-2 md:gap-3 overflow-x-auto">
         {actions}
         <button
           onClick={toggleDark}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors flex-shrink-0"
         >
           {isDark ? <Sun size={15} /> : <Moon size={15} />}
         </button>
-        <button className="w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors relative">
+        <button className="hidden sm:flex w-8 h-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors relative flex-shrink-0">
           <Bell size={15} />
           <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
         </button>

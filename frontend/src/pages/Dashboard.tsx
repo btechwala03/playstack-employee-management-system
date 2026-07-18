@@ -58,7 +58,7 @@ export default function Dashboard() {
         toggleDark={toggleTheme} 
       />
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard label="Total Employees" value={summary?.totalEmployees || 0} icon={Users} color="bg-primary" trend="Across the org" />
           <StatCard label="Active" value={active} icon={UserCheck} color="bg-emerald-500" trend="Currently working" />
           <StatCard label="Inactive" value={inactive} icon={User} color="bg-zinc-500" trend="Offboarded" />
@@ -135,9 +135,11 @@ export default function Dashboard() {
                   <p className="text-sm font-medium text-foreground truncate">{emp.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{emp.designation}</p>
                 </div>
-                <DeptBadge dept={emp.department} />
+                <div className="hidden sm:block">
+                  <DeptBadge dept={emp.department} />
+                </div>
                 <StatusBadge status={emp.status} />
-                <span className="text-xs text-muted-foreground w-24 text-right">{formatDate(emp.joiningDate)}</span>
+                <span className="text-xs text-muted-foreground hidden sm:block w-24 text-right">{formatDate(emp.joiningDate)}</span>
               </div>
             ))}
           </div>
