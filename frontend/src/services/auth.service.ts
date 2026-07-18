@@ -32,7 +32,7 @@ export const authService = {
     try {
       await apiClient.post('/auth/logout');
     } catch (error) {
-      console.error('Logout error', error);
+      // Ignored
     }
   },
 };
