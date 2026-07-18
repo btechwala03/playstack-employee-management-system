@@ -14,8 +14,11 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 const startServer = async () => {
+  console.log("PORT =", process.env.PORT);
+  console.log("ENV.PORT =", ENV.PORT);
   app.listen(Number(ENV.PORT), '0.0.0.0', () => {
     console.log(`Server running in ${ENV.NODE_ENV} mode on port ${ENV.PORT}`);
+    console.log("Server is listening successfully");
   });
   
   await connectDB();
